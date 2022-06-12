@@ -20,9 +20,6 @@ enum log_level {
 	LOG_LEVEL_TRACE
 };
 
-char initialize_logging();
-void shutdown_logging();
-
 //all log levels will use this to log
 FL_API void log_output(log_level level, const char* message, ...);
 

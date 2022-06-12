@@ -2,12 +2,11 @@
 #include <stdlib.h>
 
 int main() {
-	FL_FATAL("fatal message %d", 69);
-	FL_ERROR("error message %d", 69);
-	FL_WARN("warning message %d", 69);
-	FL_INFO("info message %d", 69);
-	FL_DEBUG("debug message %d", 69);
-	FL_TRACE("trace message %d", 69);
+	Application::ApplicationConfig app_config;
+	app_config.name = "Flatland";
+	app_config.width = 1280;
+	app_config.height = 720;
 
-	//FL_ASSERT_MSG(false, "expr is false");
+	Application application(app_config);
+	application.run();
 }

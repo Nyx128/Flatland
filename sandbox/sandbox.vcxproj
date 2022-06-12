@@ -60,7 +60,7 @@
       <ModuleDependenciesFile>$(IntDir)</ModuleDependenciesFile>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <SourceDependenciesFile>$(IntDir)</SourceDependenciesFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Flatland/src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\external;$(SolutionDir)Flatland/src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -80,7 +80,7 @@
       <ModuleDependenciesFile>$(IntDir)</ModuleDependenciesFile>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <SourceDependenciesFile>$(IntDir)</SourceDependenciesFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Flatland/src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\external;$(SolutionDir)Flatland/src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
