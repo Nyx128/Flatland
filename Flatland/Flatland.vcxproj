@@ -57,6 +57,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,6 +74,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>$(IntDir)</ObjectFileName>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -86,6 +88,7 @@
     <ClCompile Include="src\Flatland\core\logger.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="external\color.hpp" />
     <ClInclude Include="src\Flatland.hpp" />
     <ClInclude Include="src\Flatland\core\asserts.hpp" />
     <ClInclude Include="src\Flatland\core\logger.hpp" />

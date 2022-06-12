@@ -9,5 +9,5 @@ int main() {
 	FL_DEBUG("debug message %d", 69);
 	FL_TRACE("trace message %d", 69);
 
-	FL_ASSERT_MSG(false, "expr is false");
+	//FL_ASSERT_MSG(false, "expr is false");
 }
