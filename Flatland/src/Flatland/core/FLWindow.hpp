@@ -8,6 +8,8 @@ public:
 	~FLWindow();
 
 	GLFWwindow* getWindowPointer() const { return window; }
+	uint32_t getWidth() const { return width; }
+	uint32_t getHeight() const { return height; }
 private:
 	GLFWwindow* window;
 	uint32_t width, height;

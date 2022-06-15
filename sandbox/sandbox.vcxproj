@@ -90,12 +90,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\EntryPoint.cpp" />
+    <ClCompile Include="src\game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Flatland\Flatland.vcxproj">
       <Project>{a7a84ff1-6ff3-4da4-8313-97f8ba60e1a9}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\game.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

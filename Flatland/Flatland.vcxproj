@@ -97,10 +97,11 @@
     <ClInclude Include="external\color.hpp" />
     <ClInclude Include="external\GLFW\include\glfw3.h" />
     <ClInclude Include="external\GLFW\include\glfw3native.h" />
-    <ClInclude Include="src\Flatland.hpp" />
     <ClInclude Include="src\Flatland\core\application.hpp" />
     <ClInclude Include="src\Flatland\core\asserts.hpp" />
+    <ClInclude Include="src\Flatland\core\EntryPoint.hpp" />
     <ClInclude Include="src\Flatland\core\FLWindow.hpp" />
+    <ClInclude Include="src\Flatland\core\gameInstance.hpp" />
     <ClInclude Include="src\Flatland\core\logger.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
