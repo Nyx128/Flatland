@@ -1,6 +1,6 @@
 #include "application.hpp"
 #include "logger.hpp"
-#include "../vulkan/FLInstance.hpp"
+#include "../vulkan/FLDevice.hpp"
 
 Application::Application(gameInstance* _gameInst):gameInst(_gameInst) {
     window = std::make_unique<FLWindow>(gameInst->app_config.name, gameInst->app_config.width, gameInst->app_config.height);
@@ -19,7 +19,7 @@ Application::~Application(){
 
 void Application::run(){
 
-    FLInstance instance{ "Flatland testbed" };
+    FLDevice flDevice;
 
     if (!gameInst->update(gameInst, 0)) {
         FL_FATAL("failed to call the game's update function");

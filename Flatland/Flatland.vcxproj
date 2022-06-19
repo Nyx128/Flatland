@@ -108,6 +108,7 @@
     <ClInclude Include="src\Flatland\core\FLWindow.hpp" />
     <ClInclude Include="src\Flatland\core\gameInstance.hpp" />
     <ClInclude Include="src\Flatland\core\logger.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLDevice.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLInstance.hpp" />
     <ClInclude Include="src\Flatland\vulkan\vulkan_asserts.hpp" />
   </ItemGroup>

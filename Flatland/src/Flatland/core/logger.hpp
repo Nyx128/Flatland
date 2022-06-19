@@ -2,6 +2,7 @@
 #include "../core.hpp"
 
 #define LOG_LEVEL_WARN_ENABLED 1
+#define LOG_LEVEL_VALIDATION_ENABLED 1
 #define LOG_LEVEL_INFO_ENABLED 1
 #define LOG_LEVEL_DEBUG_ENABLED 1
 #define LOG_LEVEL_TRACE_ENABLED 1
@@ -12,12 +13,13 @@
 #endif
 
 enum log_level {
-	LOG_LEVEL_FATAL,
-	LOG_LEVEL_ERROR,
-	LOG_LEVEL_WARN,
-	LOG_LEVEL_INFO,
-	LOG_LEVEL_DEBUG,
-	LOG_LEVEL_TRACE
+	LOG_LEVEL_FATAL = 0,
+	LOG_LEVEL_ERROR = 1,
+	LOG_LEVEL_VALIDATION = 2,
+	LOG_LEVEL_WARN = 3,
+	LOG_LEVEL_INFO = 4,
+	LOG_LEVEL_DEBUG = 5,
+	LOG_LEVEL_TRACE = 6
 };
 
 //all log levels will use this to log
@@ -36,6 +38,13 @@ FL_API void log_output(log_level level, const char* message, ...);
 #define FL_WARN(message, ...) log_output(LOG_LEVEL_WARN, message, ##__VA_ARGS__);
 #else
 #define FL_WARN(message, ...)
+#endif
+
+#if LOG_LEVEL_VALIDATION_ENABLED == 1
+//Logs a warn message
+#define FL_VALIDATION(message, ...) log_output(LOG_LEVEL_VALIDATION, message, ##__VA_ARGS__);
+#else
+#define FL_VALIDATION(message, ...)
 #endif
 
 #if LOG_LEVEL_INFO_ENABLED == 1

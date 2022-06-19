@@ -7,8 +7,8 @@
 
 FL_API void log_output(log_level level, const char* message, ...){
 
-	const char* levelTags[6] = { "[FATAL]", "[ERROR]", "[WARN]", "[INFO]", "[DEBUG]", "[TRACE]" };
-	const char* colorTags[6] = { "red", "light red", "light yellow", "aqua", "green", "bright white" };
+	const char* levelTags[7] = { "[FATAL]", "[ERROR]", "[VALIDATION]","[WARN]", "[INFO]", "[DEBUG]", "[TRACE]" };
+	const char* colorTags[7] = { "red", "light red", "light purple", "light yellow", "aqua", "green", "bright white" };
 
 	auto tag = dye::colorize(levelTags[level], colorTags[level]).invert();
 	
