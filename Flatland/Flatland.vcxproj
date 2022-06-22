@@ -94,9 +94,12 @@
   <ItemGroup>
     <ClCompile Include="src\Flatland\core.hpp" />
     <ClCompile Include="src\Flatland\core\application.cpp" />
+    <ClCompile Include="src\Flatland\core\asserts.cpp" />
     <ClCompile Include="src\Flatland\core\FLWindow.cpp" />
     <ClCompile Include="src\Flatland\core\logger.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLDevice.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLInstance.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\vulkan_asserts.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\color.hpp" />

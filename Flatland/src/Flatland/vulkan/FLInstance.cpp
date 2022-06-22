@@ -33,7 +33,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 
 FLInstance::FLInstance(){
-
+	FL_TRACE("FLInstance constructor called");
 	FL_ASSERT_MSG((enableValidationLayers && checkValidationLayerSupport()), "validation layers requested but not supported");
 	
 	VkApplicationInfo appInfo{};
@@ -75,11 +75,10 @@ FLInstance::FLInstance(){
 }
 
 FLInstance::~FLInstance(){
-	DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-	FL_TRACE("Vulkan Debug messenger destroyed");
+	FL_TRACE("FLInstance destructor called");
 
+	DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	vkDestroyInstance(instance, nullptr);
-	FL_TRACE("Vulkan instance destroyed");
 }
 
 bool FLInstance::checkValidationLayerSupport(){

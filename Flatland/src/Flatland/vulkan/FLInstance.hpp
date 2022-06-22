@@ -10,6 +10,10 @@ public:
 	FLInstance(const FLInstance&) = delete;
 	FLInstance& operator=(const FLInstance&) = delete;
 
+	VkInstance& getInstance() {
+		return instance;
+	}
+
 private:
 	const std::vector<const char*> validationLayers = {
 		"VK_LAYER_KHRONOS_validation"
