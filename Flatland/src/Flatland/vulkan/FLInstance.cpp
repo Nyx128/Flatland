@@ -34,8 +34,22 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 FLInstance::FLInstance(){
 	FL_TRACE("FLInstance constructor called");
-	FL_ASSERT_MSG((enableValidationLayers && checkValidationLayerSupport()), "validation layers requested but not supported");
-	
+	createInstance();
+	setupDebugMessenger();
+}
+
+FLInstance::~FLInstance(){
+	FL_TRACE("FLInstance destructor called");
+
+	DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+	vkDestroyInstance(instance, nullptr);
+}
+
+void FLInstance::createInstance(){
+	if (enableValidationLayers) {
+		FL_ASSERT_MSG((enableValidationLayers && checkValidationLayerSupport()), "validation layers requested but not supported");
+	}
+
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.apiVersion = VK_API_VERSION_1_3;
@@ -72,13 +86,6 @@ FLInstance::FLInstance(){
 
 	auto result = vkCreateInstance(&createInfo, nullptr, &instance);
 	VK_CHECK_RESULT(result, "Failed to created vulkan instance");
-}
-
-FLInstance::~FLInstance(){
-	FL_TRACE("FLInstance destructor called");
-
-	DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-	vkDestroyInstance(instance, nullptr);
 }
 
 bool FLInstance::checkValidationLayerSupport(){

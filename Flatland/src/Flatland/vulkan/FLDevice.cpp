@@ -4,10 +4,12 @@
 FLDevice::FLDevice() {
 	FL_TRACE("FLDevice constructor called");
 	pickPhysicalDevice();
+	createDeviceHandle();
 }
 
 FLDevice::~FLDevice(){
 	FL_TRACE("FLDevice destructor called");
+	vkDestroyDevice(device, nullptr);
 }
 
 void FLDevice::pickPhysicalDevice(){
@@ -56,4 +58,40 @@ FLDevice::QueueFamilyIndices FLDevice::findQueueFamilies(VkPhysicalDevice device
 	}
 	
 	return indices;
+}
+
+void FLDevice::createDeviceHandle(){
+
+	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+
+	VkDeviceQueueCreateInfo queueInfo{};
+	queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+	queueInfo.queueFamilyIndex = indices.graphicsFamily.value();
+	queueInfo.queueCount = 1;
+
+	float queuePriority = 1.0f;
+	queueInfo.pQueuePriorities = &queuePriority;
+
+	VkPhysicalDeviceFeatures deviceFeatures{};
+	deviceFeatures.fillModeNonSolid = VK_TRUE;
+	deviceFeatures.wideLines = VK_TRUE;
+
+	VkDeviceCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	createInfo.pQueueCreateInfos = &queueInfo;
+	createInfo.queueCreateInfoCount = 1;
+	createInfo.pEnabledFeatures = &deviceFeatures;
+
+	if (enableValidationLayers) {
+		createInfo.ppEnabledLayerNames = instance.getValidationLayerNames();
+		createInfo.enabledLayerCount = 1;
+	}
+	else {
+		createInfo.enabledLayerCount = 0;
+	}
+
+	auto result = vkCreateDevice(physicalDevice, &createInfo, nullptr, &device);
+	VK_CHECK_RESULT(result, "failed to create Vulkan logical device");
+
+	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 }

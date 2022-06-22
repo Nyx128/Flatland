@@ -4,6 +4,8 @@
 #include "gameInstance.hpp"
 #include <memory>
 
+#include "../vulkan/FLDevice.hpp"
+
 class FL_API Application{
 public:
 	Application(gameInstance* _gameInst);
@@ -13,5 +15,8 @@ public:
 
 private:
 	std::unique_ptr<FLWindow> window;
+	FLDevice flDevice;
 	gameInstance* gameInst;
+
+	void initVulkan();
 };
