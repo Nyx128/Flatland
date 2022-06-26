@@ -1,8 +1,12 @@
 #include "FLDevice.hpp"
 #include "vulkan_asserts.hpp"
+#include "GLFW/include/glfw3native.h"
+#include <set>
+#include <string>
 
-FLDevice::FLDevice() {
+FLDevice::FLDevice(std::shared_ptr<FLWindow> window): flWindow(window) {
 	FL_TRACE("FLDevice constructor called");
+	createWindowSurface();
 	pickPhysicalDevice();
 	createDeviceHandle();
 }
@@ -10,13 +14,14 @@ FLDevice::FLDevice() {
 FLDevice::~FLDevice(){
 	FL_TRACE("FLDevice destructor called");
 	vkDestroyDevice(device, nullptr);
+	vkDestroySurfaceKHR(flInstance.getInstance(), windowSurface, nullptr);
 }
 
 void FLDevice::pickPhysicalDevice(){
 	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(instance.getInstance(), &deviceCount, nullptr);
+	vkEnumeratePhysicalDevices(flInstance.getInstance(), &deviceCount, nullptr);
 	std::vector<VkPhysicalDevice> physicalDevices(deviceCount);
-	vkEnumeratePhysicalDevices(instance.getInstance(), &deviceCount, physicalDevices.data());
+	vkEnumeratePhysicalDevices(flInstance.getInstance(), &deviceCount, physicalDevices.data());
 
 	for (const auto& device : physicalDevices) {
 		if (isDeviceSuitable(device)) {
@@ -36,7 +41,9 @@ void FLDevice::pickPhysicalDevice(){
 bool FLDevice::isDeviceSuitable(VkPhysicalDevice device){
 	auto indices = findQueueFamilies(device);
 
-	return indices.isComplete();
+	bool deviceExtensionsSupported = checkDeviceExtensionSupport(device);
+
+	return indices.isComplete() && deviceExtensionsSupported;
 }
 
 FLDevice::QueueFamilyIndices FLDevice::findQueueFamilies(VkPhysicalDevice device) {
@@ -50,8 +57,13 @@ FLDevice::QueueFamilyIndices FLDevice::findQueueFamilies(VkPhysicalDevice device
 
 	uint32_t i = 0;
 	for (const auto& family : familyProps) {
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, windowSurface, &presentSupport);
 		if (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			indices.graphicsFamily = i;
+		}
+		if (presentSupport) {
+			indices.presentFamily = i;
 		}
 		if (indices.isComplete()) { break; }
 		i++;
@@ -60,17 +72,39 @@ FLDevice::QueueFamilyIndices FLDevice::findQueueFamilies(VkPhysicalDevice device
 	return indices;
 }
 
+bool FLDevice::checkDeviceExtensionSupport(VkPhysicalDevice device){
+	uint32_t extensionCount = 0;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+	std::vector<VkExtensionProperties> extensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, extensions.data());
+
+	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+	for (const auto& extension : extensions) {
+		requiredExtensions.erase(extension.extensionName);
+	}
+
+	return requiredExtensions.empty();
+}
+
 void FLDevice::createDeviceHandle(){
 
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
-	VkDeviceQueueCreateInfo queueInfo{};
-	queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueInfo.queueFamilyIndex = indices.graphicsFamily.value();
-	queueInfo.queueCount = 1;
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	std::vector<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
 	float queuePriority = 1.0f;
-	queueInfo.pQueuePriorities = &queuePriority;
+	for (auto& queueFamily : uniqueQueueFamilies) {
+		VkDeviceQueueCreateInfo queueInfo{};
+		queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueInfo.queueFamilyIndex = queueFamily;
+		queueInfo.queueCount = 1;
+		queueInfo.pQueuePriorities = &queuePriority;
+
+		queueCreateInfos.push_back(queueInfo);
+
+	}
 
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
@@ -78,12 +112,14 @@ void FLDevice::createDeviceHandle(){
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.pQueueCreateInfos = &queueInfo;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.pQueueCreateInfos = (uniqueQueueFamilies[0] == uniqueQueueFamilies[1]) ? &queueCreateInfos[0] : queueCreateInfos.data();
+	createInfo.queueCreateInfoCount = (uniqueQueueFamilies[0] == uniqueQueueFamilies[1]) ? 1 : queueCreateInfos.size();
 	createInfo.pEnabledFeatures = &deviceFeatures;
+	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 
 	if (enableValidationLayers) {
-		createInfo.ppEnabledLayerNames = instance.getValidationLayerNames();
+		createInfo.ppEnabledLayerNames = flInstance.getValidationLayerNames();
 		createInfo.enabledLayerCount = 1;
 	}
 	else {
@@ -94,4 +130,10 @@ void FLDevice::createDeviceHandle(){
 	VK_CHECK_RESULT(result, "failed to create Vulkan logical device");
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+}
+
+void FLDevice::createWindowSurface(){
+	auto result = glfwCreateWindowSurface(flInstance.getInstance(), flWindow->getWindowPointer(), nullptr, &windowSurface);
+	VK_CHECK_RESULT(result, "failed to create vulkan window surface");
 }

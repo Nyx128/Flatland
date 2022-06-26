@@ -14,8 +14,8 @@ public:
 	void run();
 
 private:
-	std::unique_ptr<FLWindow> window;
-	FLDevice flDevice;
+	std::shared_ptr<FLWindow> window;
+	std::unique_ptr<FLDevice> device;
 	gameInstance* gameInst;
 
 	void initVulkan();

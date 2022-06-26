@@ -2,8 +2,9 @@
 #include "logger.hpp"
 
 Application::Application(gameInstance* _gameInst):gameInst(_gameInst) {
-    window = std::make_unique<FLWindow>(gameInst->app_config.name, gameInst->app_config.width, gameInst->app_config.height);
-
+    window = std::make_shared<FLWindow>(gameInst->app_config.name, gameInst->app_config.width, gameInst->app_config.height);
+    device = std::make_unique<FLDevice>(window);
+    
     if (!gameInst->initialize(gameInst)) {
         FL_FATAL("game failed to initialize");
     }
