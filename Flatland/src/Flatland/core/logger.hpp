@@ -8,8 +8,8 @@
 #define LOG_LEVEL_TRACE_ENABLED 1
 
 #ifdef NDEBUG
-	#define LOG_LEVEL_DEBUG_ENABLED 1
-	#define LOG_LEVEL_TRACE_ENABLED 1
+	#define LOG_LEVEL_DEBUG_ENABLED 0
+	#define LOG_LEVEL_TRACE_ENABLED 0
 #endif
 
 enum log_level {

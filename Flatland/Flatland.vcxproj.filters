@@ -39,6 +39,9 @@
     <ClCompile Include="src\Flatland\vulkan\vulkan_asserts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Flatland\vulkan\FLSwapchain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Flatland\core\logger.hpp">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Flatland\vulkan\FLDevice.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\FLSwapchain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

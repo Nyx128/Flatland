@@ -23,6 +23,13 @@ public:
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME
 	};
 
+	VkPhysicalDevice& getPhysicalDevice() { return physicalDevice; }
+	VkSurfaceKHR& getWindowSurface() { return windowSurface; }
+	void getFramebufferSize(int* width, int* height);
+	uint32_t getGraphicsQueueIndex();
+	uint32_t getPresentQueueIndex();
+	VkDevice& getDevice() { return device; }
+
 private:
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first
 	FLInstance flInstance;

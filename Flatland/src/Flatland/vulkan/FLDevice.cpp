@@ -17,6 +17,20 @@ FLDevice::~FLDevice(){
 	vkDestroySurfaceKHR(flInstance.getInstance(), windowSurface, nullptr);
 }
 
+void FLDevice::getFramebufferSize(int* width, int* height){
+	glfwGetFramebufferSize(flWindow->getWindowPointer(), width, height);
+}
+
+uint32_t FLDevice::getGraphicsQueueIndex(){
+	auto indices = findQueueFamilies(physicalDevice);
+	return indices.graphicsFamily.value();
+}
+
+uint32_t FLDevice::getPresentQueueIndex(){
+	auto indices = findQueueFamilies(physicalDevice);
+	return indices.presentFamily.value();
+}
+
 void FLDevice::pickPhysicalDevice(){
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(flInstance.getInstance(), &deviceCount, nullptr);
