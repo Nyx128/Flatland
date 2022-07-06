@@ -29,6 +29,7 @@ public:
 	uint32_t getGraphicsQueueIndex();
 	uint32_t getPresentQueueIndex();
 	VkDevice& getDevice() { return device; }
+	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
 private:
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first

@@ -59,6 +59,9 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;C:\dev\3D\Flatland\Flatland\src\Flatland\vulkan;C:\dev\3D\Flatland\Flatland\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -66,6 +69,9 @@
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;C:\dev\3D\Flatland\Flatland\external\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>cmd /c "C:\dev\3D\Flatland\Flatland\src\Flatland\shaders\compile_shaders.bat"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -81,6 +87,9 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -90,16 +99,21 @@
       <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;C:\dev\3D\Flatland\Flatland\external\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>cmd /c "C:\dev\3D\Flatland\Flatland\src\Flatland\shaders\compile_shaders.bat"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Flatland\core.hpp" />
     <ClCompile Include="src\Flatland\core\application.cpp" />
     <ClCompile Include="src\Flatland\core\asserts.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLPipeline.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLSwapchain.cpp" />
     <ClCompile Include="src\Flatland\core\FLWindow.cpp" />
     <ClCompile Include="src\Flatland\core\logger.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLDevice.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLInstance.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLUtil.cpp" />
     <ClCompile Include="src\Flatland\vulkan\vulkan_asserts.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -109,13 +123,20 @@
     <ClInclude Include="src\Flatland\core\application.hpp" />
     <ClInclude Include="src\Flatland\core\asserts.hpp" />
     <ClInclude Include="src\Flatland\core\EntryPoint.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLPipeline.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLSwapchain.hpp" />
     <ClInclude Include="src\Flatland\core\FLWindow.hpp" />
     <ClInclude Include="src\Flatland\core\gameInstance.hpp" />
     <ClInclude Include="src\Flatland\core\logger.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLDevice.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLInstance.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLUtil.hpp" />
     <ClInclude Include="src\Flatland\vulkan\vulkan_asserts.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Flatland\shaders\compile_shaders.bat" />
+    <None Include="src\Flatland\shaders\unlit.frag" />
+    <None Include="src\Flatland\shaders\unlit.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
