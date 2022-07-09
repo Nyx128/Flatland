@@ -31,8 +31,15 @@ private:
 	VkFormat swapchainImageFormat;
 	VkFormat swapchainDepthFormat;
 
+	uint32_t imageCount = 0;
+
 	std::vector<VkImage> swapchainImages;
 	std::vector<VkImageView> swapchainImageViews;
+	std::vector<VkImage> depthImages;
+	std::vector<VkImageView> depthImageViews;
+	std::vector<VkDeviceMemory> depthImageMemorys;
+
+	std::vector<VkFramebuffer> swapchainFramebuffers;
 
 	SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice phyDevice);
 	VkSurfaceFormatKHR chooseSurfaceFormat(std::vector<VkSurfaceFormatKHR> availableFormats);
@@ -43,4 +50,6 @@ private:
 	void createRenderPass();
 	void retrieveSwapchainImages();
 	void createSwapchainImageViews();
+	void createDepthResources();
+	void createFramebuffers();
 };

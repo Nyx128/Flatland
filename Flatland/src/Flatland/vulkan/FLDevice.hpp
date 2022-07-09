@@ -30,6 +30,8 @@ public:
 	uint32_t getPresentQueueIndex();
 	VkDevice& getDevice() { return device; }
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	void createImage(const VkImageCreateInfo& createInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
 private:
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first

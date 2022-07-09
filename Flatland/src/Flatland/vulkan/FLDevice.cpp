@@ -47,6 +47,38 @@ VkFormat FLDevice::findSupportedFormat(const std::vector<VkFormat> &candidates, 
 	FL_ASSERT_MSG(false, "Failed to find supported format");
 }
 
+uint32_t FLDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties){
+	VkPhysicalDeviceMemoryProperties memProperties;
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+	for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+		if ((typeFilter & (1 << i)) &&
+			(memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+			return i;
+		}
+	}
+	FL_ASSERT_MSG(false, "Failed to find suitable memory type");
+}
+
+void FLDevice::createImage(const VkImageCreateInfo& createInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory){
+	auto result = vkCreateImage(device, &createInfo, nullptr, &image);
+	VK_CHECK_RESULT(result, "Failed to create Image");
+
+
+	VkMemoryRequirements memRequirements;
+	vkGetImageMemoryRequirements(device, image, &memRequirements);
+
+	VkMemoryAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+	allocInfo.allocationSize = memRequirements.size;
+	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+
+    result = vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory);
+	VK_CHECK_RESULT(result, "Failed to allocate Image memory");
+
+	result = vkBindImageMemory(device, image, imageMemory, 0);
+	VK_CHECK_RESULT(result, "Failed to bind Image memory");
+}
+
 void FLDevice::pickPhysicalDevice(){
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(flInstance.getInstance(), &deviceCount, nullptr);

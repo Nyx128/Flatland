@@ -10,16 +10,27 @@ FLSwapchain::FLSwapchain(FLDevice& _device):device(_device){
 	createRenderPass();
 	retrieveSwapchainImages();
 	createSwapchainImageViews();
+	createDepthResources();
 }
 
 FLSwapchain::~FLSwapchain(){
 	FL_TRACE("FLSwapchain destructor called");
+	for (auto framebuffer : swapchainFramebuffers) {
+		vkDestroyFramebuffer(device.getDevice(), framebuffer, nullptr);
+	}
+
 	vkDestroyRenderPass(device.getDevice(), renderPass, nullptr);
-	vkDestroySwapchainKHR(device.getDevice(), swapchain, nullptr);
 
 	for (auto& imageView : swapchainImageViews) {
 		vkDestroyImageView(device.getDevice(), imageView, nullptr);
 	}
+
+	for (int i = 0; i < depthImages.size(); i++) {
+		vkDestroyImageView(device.getDevice(), depthImageViews[i], nullptr);
+		vkDestroyImage(device.getDevice(), depthImages[i], nullptr);
+		vkFreeMemory(device.getDevice(), depthImageMemorys[i], nullptr);
+	}
+	vkDestroySwapchainKHR(device.getDevice(), swapchain, nullptr);
 }
 
 FLSwapchain::SwapchainSupportDetails FLSwapchain::querySwapchainSupport(VkPhysicalDevice phyDevice){
@@ -197,7 +208,7 @@ void FLSwapchain::createRenderPass(){
 }
 
 void FLSwapchain::retrieveSwapchainImages(){
-	uint32_t imageCount = 0;
+	imageCount = 0;
 	vkGetSwapchainImagesKHR(device.getDevice(), swapchain, &imageCount, nullptr);
 	swapchainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device.getDevice(), swapchain, &imageCount, swapchainImages.data());
@@ -227,5 +238,69 @@ void FLSwapchain::createSwapchainImageViews(){
 
 		auto result = vkCreateImageView(device.getDevice(), &createInfo, nullptr, &swapchainImageViews[i]);
 		VK_CHECK_RESULT(result, "Failed to created image view for swapchain");
+	}
+}
+
+void FLSwapchain::createDepthResources(){
+	size_t imageCount = swapchainImages.size();
+
+	depthImages.resize(imageCount);
+	depthImageMemorys.resize(imageCount);
+	depthImageViews.resize(imageCount);
+
+	for (int i = 0; i < depthImages.size(); i++) {
+		VkImageCreateInfo imageInfo{};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageInfo.extent.width = swapchainExtent.width;
+		imageInfo.extent.height = swapchainExtent.height;
+		imageInfo.extent.depth = 1;
+		imageInfo.mipLevels = 1;
+		imageInfo.arrayLayers = 1;
+		imageInfo.format = swapchainDepthFormat;
+		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageInfo.flags = 0;
+
+		device.createImage(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImages[i], depthImageMemorys[i]);
+
+		VkImageViewCreateInfo viewInfo{};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.image = depthImages[i];
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.format = swapchainDepthFormat;
+		viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+
+		auto result = vkCreateImageView(device.getDevice(), &viewInfo, nullptr, &depthImageViews[i]);
+		VK_CHECK_RESULT(result, "Failed to created depth image views");
+	}
+}
+
+void FLSwapchain::createFramebuffers(){
+	swapchainFramebuffers.resize(imageCount);
+
+	
+
+	for (int i = 0; i < imageCount; i++) {
+		std::array<VkImageView, 2> attachments = { swapchainImageViews[i], depthImageViews[i] };
+		
+		VkFramebufferCreateInfo framebufferInfo = {};
+		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		framebufferInfo.renderPass = renderPass;
+		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+		framebufferInfo.pAttachments = attachments.data();
+		framebufferInfo.width = swapchainExtent.width;
+		framebufferInfo.height = swapchainExtent.height;
+		framebufferInfo.layers = 1;
+
+		auto result = vkCreateFramebuffer(device.getDevice(), &framebufferInfo, nullptr, &swapchainFramebuffers[i]);
+		VK_CHECK_RESULT(result, "Failed to create swapchain framebuffers");
 	}
 }
