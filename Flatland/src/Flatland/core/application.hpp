@@ -7,6 +7,7 @@
 #include "../vulkan/FLDevice.hpp"
 #include "../vulkan/FLSwapchain.hpp"
 #include "../vulkan/FLPipeline.hpp"
+#include "../vulkan/FLRenderer.hpp"
 
 class FL_API Application{
 public:
@@ -20,6 +21,7 @@ private:
 	std::unique_ptr<FLDevice> device;
 	std::unique_ptr<FLSwapchain> swapchain;
 	std::unique_ptr<FLPipeline> graphicsPipeline;
+	std::unique_ptr<FLRenderer> renderer;
 	gameInstance* gameInst;
 
 	void initVulkan();

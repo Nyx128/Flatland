@@ -15,6 +15,9 @@ Application::Application(gameInstance* _gameInst):gameInst(_gameInst) {
 
     graphicsPipeline = std::make_unique<FLPipeline>(*device, *swapchain, pipelineBuilder);
 
+    FLRenderer::FLRendererConfig rendererConfig{};
+    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, rendererConfig);
+
     if (!gameInst->initialize(gameInst)) {
         FL_FATAL("game failed to initialize");
     }
@@ -41,6 +44,7 @@ void Application::run(){
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         glfwPollEvents();
+        renderer->draw();
     }
 }
 

@@ -32,6 +32,7 @@ public:
 	FLPipeline& operator=(const FLPipeline&) = delete;
 
 	static void createDefaultPipelineConfig(FLPipelineConfig& pipelineConfig);
+	VkPipeline& getPipeline() { return graphicsPipeline; }
 
 private:
 	FLDevice& device;

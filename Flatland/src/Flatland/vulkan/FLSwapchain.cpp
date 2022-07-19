@@ -11,6 +11,7 @@ FLSwapchain::FLSwapchain(FLDevice& _device):device(_device){
 	retrieveSwapchainImages();
 	createSwapchainImageViews();
 	createDepthResources();
+	createFramebuffers();
 }
 
 FLSwapchain::~FLSwapchain(){
@@ -285,8 +286,6 @@ void FLSwapchain::createDepthResources(){
 
 void FLSwapchain::createFramebuffers(){
 	swapchainFramebuffers.resize(imageCount);
-
-	
 
 	for (int i = 0; i < imageCount; i++) {
 		std::array<VkImageView, 2> attachments = { swapchainImageViews[i], depthImageViews[i] };

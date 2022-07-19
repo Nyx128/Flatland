@@ -81,6 +81,9 @@
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <SourceDependenciesFile>$(IntDir)</SourceDependenciesFile>
       <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;C:\dev\3D\Flatland\Flatland\external;$(SolutionDir)Flatland/src</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

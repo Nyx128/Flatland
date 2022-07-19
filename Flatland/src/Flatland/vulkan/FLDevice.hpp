@@ -32,6 +32,8 @@ public:
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	void createImage(const VkImageCreateInfo& createInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	VkQueue& getGraphicsQueue() { return graphicsQueue; }
+	VkQueue& getPresentQueue() { return presentQueue; }
 
 private:
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first

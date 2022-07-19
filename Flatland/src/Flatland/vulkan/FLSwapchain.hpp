@@ -18,6 +18,11 @@ public:
 	VkFormat getImageFormat() { return swapchainImageFormat; }
 	VkFormat getDepthFormat() { return swapchainDepthFormat; }
 	VkRenderPass& getRenderPass() { return renderPass; }
+	VkFramebuffer& getswapchainFramebuffer(uint32_t _imageIndex) {
+		return swapchainFramebuffers[_imageIndex];
+	}
+	VkExtent2D getswapchainExtent() { return swapchainExtent; }
+	VkSwapchainKHR& getHandle() { return swapchain; }
 
 private:
 	FLDevice& device;
