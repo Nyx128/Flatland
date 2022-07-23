@@ -34,16 +34,18 @@ void Application::run(){
 
     initVulkan();
 
-    if (!gameInst->update(gameInst, 0)) {
-        FL_FATAL("failed to call the game's update function");
-    }
-
-    if (!gameInst->render(gameInst, 0)) {
-        FL_FATAL("failed to call the game's render function");
-    }
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         glfwPollEvents();
+
+        if (!gameInst->update(gameInst, 0)) {
+            FL_FATAL("failed to call the game's update function");
+        }
+
+        if (!gameInst->render(gameInst, 0)) {
+            FL_FATAL("failed to call the game's render function");
+        }
+
         renderer->draw();
     }
 }

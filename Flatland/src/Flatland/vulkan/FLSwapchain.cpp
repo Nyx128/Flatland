@@ -71,8 +71,16 @@ VkSurfaceFormatKHR FLSwapchain::chooseSurfaceFormat(std::vector<VkSurfaceFormatK
 
 VkPresentModeKHR FLSwapchain::choosePresentMode(std::vector<VkPresentModeKHR> availablePresentModes){
 	for (const auto& presentMode : availablePresentModes) {
-		if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR) { return presentMode; }
+		if (presentMode == VK_PRESENT_MODE_MAILBOX_KHR){ 
+			FL_INFO("Present Mode: VK_PRESENT_MODE_MAILBOX_KHR"); 
+			return presentMode;
+		}
+		if (presentMode == VK_PRESENT_MODE_FIFO_RELAXED_KHR) {
+			FL_INFO("Present Mode : VK_PRESENT_MODE_FIFO_RELAXED_KHR"); 
+			return presentMode; 
+		}
 	}
+	FL_INFO("Present Mode : VK_PRESENT_MODE_FIFO_KHR");
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 

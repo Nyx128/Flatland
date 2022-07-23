@@ -17,18 +17,21 @@ public:
 	void draw();
 
 private:
+	const int MAX_FRAMES_IN_FLIGHT = 3;
+
 	FLDevice& device;
 	FLSwapchain& swapchain;
 	FLPipeline& graphicsPipeline;
 
 	uint32_t imageIndex;
+	uint32_t currentFrame = 0;
 
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
-	VkFence inFlightFence;
+	std::vector<VkSemaphore> imageAvailableSemaphores;
+	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkFence> inFlightFences;
 
 	void createCommandPool();
 	void createCommandBuffers();

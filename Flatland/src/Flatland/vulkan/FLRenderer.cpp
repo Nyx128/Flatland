@@ -17,41 +17,43 @@ FLRenderer::~FLRenderer(){
 	FL_TRACE("FLRenderer destructor called");
 	vkDestroyCommandPool(device.getDevice(), commandPool, nullptr);
 
-	vkDestroySemaphore(device.getDevice(), imageAvailableSemaphore, nullptr);
-	vkDestroySemaphore(device.getDevice(), renderFinishedSemaphore, nullptr);
-	vkDestroyFence(device.getDevice(), inFlightFence, nullptr);
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		vkDestroySemaphore(device.getDevice(), imageAvailableSemaphores[i], nullptr);
+		vkDestroySemaphore(device.getDevice(), renderFinishedSemaphores[i], nullptr);
+		vkDestroyFence(device.getDevice(), inFlightFences[i], nullptr);
+	}
 }
 
 void FLRenderer::draw(){
-	vkWaitForFences(device.getDevice(), 1, &inFlightFence, VK_TRUE, UINT64_MAX);
-	vkResetFences(device.getDevice(), 1, &inFlightFence);
+	vkWaitForFences(device.getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+	vkResetFences(device.getDevice(), 1, &inFlightFences[currentFrame]);
 
-	vkAcquireNextImageKHR(device.getDevice(), swapchain.getHandle(), UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+	vkAcquireNextImageKHR(device.getDevice(), swapchain.getHandle(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	vkResetCommandBuffer(commandBuffers[0], 0);
-	beginCommandBuffers(commandBuffers[0]);
-	beginRenderpass(commandBuffers[0], imageIndex);
-	recordCommands(commandBuffers[0]);
-	endRenderpass(commandBuffers[0]);
-	endCommandBuffers(commandBuffers[0]);
+	vkResetCommandBuffer(commandBuffers[currentFrame], 0);
+	beginCommandBuffers(commandBuffers[currentFrame]);
+	beginRenderpass(commandBuffers[currentFrame], imageIndex);
+	recordCommands(commandBuffers[currentFrame]);
+	endRenderpass(commandBuffers[currentFrame]);
+	endCommandBuffers(commandBuffers[currentFrame]);
 
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
+	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[currentFrame]};
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[0];
+	submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
 
-	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
+	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[currentFrame]};
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	auto result = vkQueueSubmit(device.getGraphicsQueue(), 1, &submitInfo, inFlightFence);
+	auto result = vkQueueSubmit(device.getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]);
 	VK_CHECK_RESULT(result, "Failed to submit draw commands");
 
 	VkPresentInfoKHR presentInfo{};
@@ -64,6 +66,7 @@ void FLRenderer::draw(){
 	presentInfo.pImageIndices = &imageIndex;
 
 	vkQueuePresentKHR(device.getPresentQueue(), &presentInfo);
+	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void FLRenderer::createCommandPool(){
@@ -77,13 +80,15 @@ void FLRenderer::createCommandPool(){
 }
 
 void FLRenderer::createCommandBuffers(){
+
+	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = commandPool;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-	commandBuffers.resize(1);
 	auto result = vkAllocateCommandBuffers(device.getDevice(), &allocInfo, commandBuffers.data());
 	VK_CHECK_RESULT(result, "Failed to create renderer command buffers");
 }
@@ -127,14 +132,20 @@ void FLRenderer::createSyncObjects(){
 	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-	auto sem1_res = vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphore);
-	auto sem2_res = vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphore);
+	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
-	auto fence_result = vkCreateFence(device.getDevice(), &fenceInfo, nullptr, &inFlightFence);
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		auto sem1_res = vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]);
+		auto sem2_res = vkCreateSemaphore(device.getDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]);
 
-	VK_CHECK_RESULT(sem1_res, "Failed to create image available semaphore");
-	VK_CHECK_RESULT(sem2_res, "Failed to create render finished semaphore")
-	VK_CHECK_RESULT(fence_result, "Failed to create in flight fence");
+		auto fence_result = vkCreateFence(device.getDevice(), &fenceInfo, nullptr, &inFlightFences[i]);
+
+		VK_CHECK_RESULT(sem1_res, "Failed to create image available semaphore");
+		VK_CHECK_RESULT(sem2_res, "Failed to create render finished semaphore")
+		VK_CHECK_RESULT(fence_result, "Failed to create in flight fence");
+	}
 }
 
 void FLRenderer::beginRenderpass(VkCommandBuffer& commandBuffer, uint32_t imageIndex){
