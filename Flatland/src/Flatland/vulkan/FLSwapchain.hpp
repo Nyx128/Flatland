@@ -23,6 +23,7 @@ public:
 	}
 	VkExtent2D getswapchainExtent() { return swapchainExtent; }
 	VkSwapchainKHR& getHandle() { return swapchain; }
+	void recreateSwapchain();
 
 private:
 	FLDevice& device;
@@ -57,4 +58,7 @@ private:
 	void createSwapchainImageViews();
 	void createDepthResources();
 	void createFramebuffers();
+
+	//swapchain recreation
+	void cleanSwapchain();
 };

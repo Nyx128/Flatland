@@ -11,8 +11,15 @@ public:
 	GLFWwindow* getWindowPointer() { return window; }
 	uint32_t getWidth() const { return width; }
 	uint32_t getHeight() const { return height; }
+
+	bool isResized() { return framebufferResized; }
+	void resetResizeFlag() { framebufferResized = false; }
 private:
 	GLFWwindow* window;
 	uint32_t width, height;
 	const char* windowName;
+
+	bool framebufferResized = false;
+
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 };

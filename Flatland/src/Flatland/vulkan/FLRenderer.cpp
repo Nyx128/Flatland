@@ -26,9 +26,18 @@ FLRenderer::~FLRenderer(){
 
 void FLRenderer::draw(){
 	vkWaitForFences(device.getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-	vkResetFences(device.getDevice(), 1, &inFlightFences[currentFrame]);
 
-	vkAcquireNextImageKHR(device.getDevice(), swapchain.getHandle(), UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	auto result = vkAcquireNextImageKHR(device.getDevice(), swapchain.getHandle(), UINT64_MAX,
+		imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		swapchain.recreateSwapchain();
+		return;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		FL_ASSERT("Failed to acquire image from swapchain");
+	}
+	vkResetFences(device.getDevice(), 1, &inFlightFences[currentFrame]);
 
 	vkResetCommandBuffer(commandBuffers[currentFrame], 0);
 	beginCommandBuffers(commandBuffers[currentFrame]);
@@ -53,7 +62,7 @@ void FLRenderer::draw(){
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
-	auto result = vkQueueSubmit(device.getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]);
+	result = vkQueueSubmit(device.getGraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]);
 	VK_CHECK_RESULT(result, "Failed to submit draw commands");
 
 	VkPresentInfoKHR presentInfo{};
@@ -65,7 +74,15 @@ void FLRenderer::draw(){
 	presentInfo.pSwapchains = &swapchain.getHandle();
 	presentInfo.pImageIndices = &imageIndex;
 
-	vkQueuePresentKHR(device.getPresentQueue(), &presentInfo);
+	result = vkQueuePresentKHR(device.getPresentQueue(), &presentInfo);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||device.getWindow()->isResized()) {
+		device.getWindow()->resetResizeFlag();
+		swapchain.recreateSwapchain();
+	}
+	else if (result != VK_SUCCESS) {
+		FL_FATAL("Failed to present swapchain image");
+	}
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 

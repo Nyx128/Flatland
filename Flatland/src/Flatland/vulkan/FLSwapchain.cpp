@@ -7,9 +7,9 @@
 FLSwapchain::FLSwapchain(FLDevice& _device):device(_device){
 	FL_TRACE("FLSwapchain constructor called");
 	createSwapchain();
-	createRenderPass();
 	retrieveSwapchainImages();
 	createSwapchainImageViews();
+	createRenderPass();
 	createDepthResources();
 	createFramebuffers();
 }
@@ -310,4 +310,41 @@ void FLSwapchain::createFramebuffers(){
 		auto result = vkCreateFramebuffer(device.getDevice(), &framebufferInfo, nullptr, &swapchainFramebuffers[i]);
 		VK_CHECK_RESULT(result, "Failed to create swapchain framebuffers");
 	}
+}
+
+void FLSwapchain::cleanSwapchain(){
+	for (auto framebuffer : swapchainFramebuffers) {
+		vkDestroyFramebuffer(device.getDevice(), framebuffer, nullptr);
+	}
+
+	for (auto& imageView : swapchainImageViews) {
+		vkDestroyImageView(device.getDevice(), imageView, nullptr);
+	}
+
+	for (int i = 0; i < depthImages.size(); i++) {
+		vkDestroyImageView(device.getDevice(), depthImageViews[i], nullptr);
+		vkDestroyImage(device.getDevice(), depthImages[i], nullptr);
+		vkFreeMemory(device.getDevice(), depthImageMemorys[i], nullptr);
+	}
+	vkDestroySwapchainKHR(device.getDevice(), swapchain, nullptr);
+}
+
+void FLSwapchain::recreateSwapchain(){
+
+	FL_INFO("Swapchain recreated");
+	int width = 0, height = 0;
+	glfwGetFramebufferSize(device.getWindow()->getWindowPointer(), &width, &height);
+	while (width == 0 || height == 0) {
+		glfwGetFramebufferSize(device.getWindow()->getWindowPointer(), &width, &height);
+		glfwWaitEvents();
+	}
+
+	vkDeviceWaitIdle(device.getDevice());
+	cleanSwapchain();
+	
+	createSwapchain();
+	retrieveSwapchainImages();
+	createSwapchainImageViews();
+	createDepthResources();
+	createFramebuffers();
 }

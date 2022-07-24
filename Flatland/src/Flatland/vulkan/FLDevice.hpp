@@ -34,6 +34,7 @@ public:
 	void createImage(const VkImageCreateInfo& createInfo, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 	VkQueue& getGraphicsQueue() { return graphicsQueue; }
 	VkQueue& getPresentQueue() { return presentQueue; }
+	std::shared_ptr<FLWindow> getWindow() { return flWindow; }
 
 private:
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first
