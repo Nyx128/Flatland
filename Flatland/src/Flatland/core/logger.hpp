@@ -1,5 +1,4 @@
 #pragma once
-#include "../core.hpp"
 
 #define LOG_LEVEL_WARN_ENABLED 1
 #define LOG_LEVEL_VALIDATION_ENABLED 1
@@ -23,7 +22,7 @@ enum log_level {
 };
 
 //all log levels will use this to log
-FL_API void log_output(log_level level, const char* message, ...);
+void log_output(log_level level, const char* message, ...);
 
 //Logs a fatal log output
 #define FL_FATAL(message, ...) log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__);

@@ -1,7 +1,7 @@
 @echo off
 set shaderDir=C:\dev\3D\Flatland\Flatland\src\Flatland\shaders
 set GLSLC="%VULKAN_SDK%\Bin\glslc.exe"
-set OUTPUT=C:\dev\3D\Flatland\sandbox\src\shaders
+set OUTPUT=C:\dev\3D\Flatland\Flatland\src\Flatland\shaders
 
 
 CALL %GLSLC% "%shaderDir%\unlit.vert" -o "%OUTPUT%\unlit.vert.spv"

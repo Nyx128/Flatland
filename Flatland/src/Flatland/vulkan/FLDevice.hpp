@@ -3,6 +3,7 @@
 #include <memory>
 #include "FLInstance.hpp"
 #include "../core/FLWindow.hpp"
+#include "VMA/vk_mem_alloc.h"
 
 class FLDevice {
 public:
@@ -35,8 +36,12 @@ public:
 	VkQueue& getGraphicsQueue() { return graphicsQueue; }
 	VkQueue& getPresentQueue() { return presentQueue; }
 	std::shared_ptr<FLWindow> getWindow() { return flWindow; }
+	VkInstance& getInstance() { return flInstance.getInstance(); }
+	VmaAllocator& getAllocator() { return allocator; }
+	VkCommandPool getCommandPool() { return commandPool; }
 
 private:
+	VmaAllocator allocator;
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first
 	FLInstance flInstance;
 
@@ -47,11 +52,14 @@ private:
 	VkQueue presentQueue;
 	std::shared_ptr<FLWindow> flWindow;
 
+	VkCommandPool commandPool;
 
 	void pickPhysicalDevice();
 	bool isDeviceSuitable(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 	void createDeviceHandle();
+	void createVmaAllocator();
+	void createCommandPool();
 	void createWindowSurface();
 };

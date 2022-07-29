@@ -12,7 +12,7 @@ int main() {
 	}
 
 	//check for game's function pointers.
-	if (!gameInst.initialize || !gameInst.update || !gameInst.render || !gameInst.resize) {
+	if (!gameInst.initialize || !gameInst.update || !gameInst.render) {
 		FL_FATAL("The game's function pointers must be assigned");
 		return -2;
 	}

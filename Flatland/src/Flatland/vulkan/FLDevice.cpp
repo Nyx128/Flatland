@@ -1,6 +1,7 @@
 #include "FLDevice.hpp"
 #include "vulkan_asserts.hpp"
 #include "GLFW/include/glfw3native.h"
+
 #include <set>
 #include <string>
 
@@ -9,12 +10,18 @@ FLDevice::FLDevice(std::shared_ptr<FLWindow> window): flWindow(window) {
 	createWindowSurface();
 	pickPhysicalDevice();
 	createDeviceHandle();
+	createVmaAllocator();
+	createCommandPool();
 }
 
 FLDevice::~FLDevice(){
 	FL_TRACE("FLDevice destructor called");
-	vkDestroyDevice(device, nullptr);
 	vkDestroySurfaceKHR(flInstance.getInstance(), windowSurface, nullptr);
+	vmaDestroyAllocator(allocator);
+
+	vkDeviceWaitIdle(device);
+	vkDestroyCommandPool(device, commandPool, nullptr);
+	vkDestroyDevice(device, nullptr);
 }
 
 void FLDevice::getFramebufferSize(int* width, int* height){
@@ -193,6 +200,27 @@ void FLDevice::createDeviceHandle(){
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+}
+
+void FLDevice::createVmaAllocator(){
+	VmaAllocatorCreateInfo createInfo{};
+	createInfo.device = device;
+	createInfo.instance = flInstance.getInstance();
+	createInfo.physicalDevice = physicalDevice;
+	createInfo.vulkanApiVersion = VK_API_VERSION_1_3;
+
+	auto result = vmaCreateAllocator(&createInfo, &allocator);
+	VK_CHECK_RESULT(result, "Failed to create vulkan memory allocator");
+}
+
+void FLDevice::createCommandPool(){
+	VkCommandPoolCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	createInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	createInfo.queueFamilyIndex = getGraphicsQueueIndex();
+
+	auto result = vkCreateCommandPool(device, &createInfo, nullptr, &commandPool);
+	VK_CHECK_RESULT(result, "Failed to create main command pool");
 }
 
 void FLDevice::createWindowSurface(){

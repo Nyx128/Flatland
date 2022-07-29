@@ -1,28 +1,12 @@
 #include "application.hpp"
 #include "logger.hpp"
+#include "vulkan_asserts.hpp"
+#include "FLModel2D.hpp"
+#include "FLVertexBuffer.hpp"
 
-Application::Application(gameInstance* _gameInst):gameInst(_gameInst) {
-    window = std::make_shared<FLWindow>(gameInst->app_config.name, gameInst->app_config.width, gameInst->app_config.height);
-    device = std::make_unique<FLDevice>(window);
-    swapchain = std::make_unique<FLSwapchain>(*device);
 
-    FLPipeline::FLPipelineBuilder pipelineBuilder;
-    FLPipeline::FLPipelineConfig pipelineConfig;
-    FLPipeline::createDefaultPipelineConfig(pipelineConfig);
-    pipelineBuilder.pipelineConfig = pipelineConfig;
-    pipelineBuilder.vertPath = "src/shaders/unlit.vert.spv";
-    pipelineBuilder.fragPath = "src/shaders/unlit.frag.spv";
-
-    graphicsPipeline = std::make_unique<FLPipeline>(*device, *swapchain, pipelineBuilder);
-
-    FLRenderer::FLRendererConfig rendererConfig{};
-    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, rendererConfig);
-
-    if (!gameInst->initialize(gameInst)) {
-        FL_FATAL("game failed to initialize");
-    }
-
-    gameInst->resize(gameInst, window->getWidth(), window->getHeight());
+Application::Application() {
+    
 
 }
 
@@ -30,26 +14,41 @@ Application::~Application(){
 
 }
 
+void Application::initVulkan(){
+    window = std::make_shared<FLWindow>("Sandbox", 1280, 720);
+    device = std::make_unique<FLDevice>(window);
+    
+    swapchain = std::make_unique<FLSwapchain>(*device);
+
+    FLPipeline::FLPipelineBuilder pipelineBuilder;
+    FLPipeline::FLPipelineConfig pipelineConfig;
+    FLPipeline::createDefaultPipelineConfig(pipelineConfig);
+    pipelineBuilder.pipelineConfig = pipelineConfig;
+    pipelineBuilder.vertPath = "src/Flatland/shaders/unlit.vert.spv";
+    pipelineBuilder.fragPath = "src/Flatland/shaders/unlit.frag.spv";
+
+    graphicsPipeline = std::make_unique<FLPipeline>(*device, *swapchain, pipelineBuilder);
+}
+
+
 void Application::run(){
 
     initVulkan();
-
+    const std::vector<FLModel2D::Vertex> vertices = {
+    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    };
+    FLModel2D triangle{ vertices };
+    FLVertexBuffer buffer{*device, (void*)triangle.getVertices().data(), sizeof(FLModel2D::Vertex) * vertices.size() };
+    
+    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, buffer);
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         glfwPollEvents();
 
-        if (!gameInst->update(gameInst, 0)) {
-            FL_FATAL("failed to call the game's update function");
-        }
-
-        if (!gameInst->render(gameInst, 0)) {
-            FL_FATAL("failed to call the game's render function");
-        }
-
         renderer->draw();
     }
+
 }
 
-void Application::initVulkan(){
-    
-}

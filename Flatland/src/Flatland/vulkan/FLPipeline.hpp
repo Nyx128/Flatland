@@ -7,7 +7,6 @@ class FLPipeline {
 public:
 
 	struct FLPipelineConfig {
-		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
 		VkPipelineViewportStateCreateInfo viewportInfo{};
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo{};

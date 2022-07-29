@@ -1,5 +1,4 @@
 #pragma once
-#include "../core.hpp"
 #include "GLFW/include/glfw3.h"
 #include "GLFW/include/glfw3native.h"
 

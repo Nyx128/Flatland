@@ -4,10 +4,9 @@
 #include "../core/logger.hpp"
 #include "vulkan_asserts.hpp"
 
-FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLRendererConfig& rendererConfig): device(_device),
-swapchain(_swapchain), graphicsPipeline(_pipeline) {
+FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLVertexBuffer& vertexBuffer): device(_device),
+swapchain(_swapchain), graphicsPipeline(_pipeline), vBuffer(vertexBuffer) {
 	FL_TRACE("FLRenderer constructor called");
-	createCommandPool();
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -15,7 +14,6 @@ swapchain(_swapchain), graphicsPipeline(_pipeline) {
 FLRenderer::~FLRenderer(){
 	vkDeviceWaitIdle(device.getDevice());
 	FL_TRACE("FLRenderer destructor called");
-	vkDestroyCommandPool(device.getDevice(), commandPool, nullptr);
 
 	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device.getDevice(), imageAvailableSemaphores[i], nullptr);
@@ -86,23 +84,13 @@ void FLRenderer::draw(){
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void FLRenderer::createCommandPool(){
-	VkCommandPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	poolInfo.queueFamilyIndex = device.getGraphicsQueueIndex();
-
-	auto result = vkCreateCommandPool(device.getDevice(), &poolInfo, nullptr, &commandPool);
-	VK_CHECK_RESULT(result, "Failed to create renderer command pool");
-}
-
 void FLRenderer::createCommandBuffers(){
 
 	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
+	allocInfo.commandPool = device.getCommandPool();
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
@@ -127,6 +115,10 @@ void FLRenderer::recordCommands(VkCommandBuffer& commandBuffer){
 	scissor.offset = { 0, 0 };
 	scissor.extent = swapchain.getswapchainExtent();
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+	VkDeviceSize offsets[] = { 0 };
+	VkBuffer vertexBuffers[] = {vBuffer.getBuffer()};
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
 	//draw command
 	vkCmdDraw(commandBuffer, 3, 1, 0, 0);

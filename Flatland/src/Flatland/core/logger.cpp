@@ -5,7 +5,7 @@
 #include <string>
 #include "color.hpp"
 
-FL_API void log_output(log_level level, const char* message, ...){
+void log_output(log_level level, const char* message, ...){
 
 	const char* levelTags[7] = { "[FATAL]", "[ERROR]", "[VALIDATION]","[WARN]", "[INFO]", "[DEBUG]", "[TRACE]" };
 	const char* colorTags[7] = { "red", "light red", "light purple", "light yellow", "aqua", "green", "bright white" };

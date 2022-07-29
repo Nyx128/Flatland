@@ -1,14 +1,12 @@
 #pragma once
 #include "FLSwapchain.hpp"
 #include "FLPipeline.hpp"
+#include "FLVertexBuffer.hpp"
 
 class FLRenderer {
 public:
 
-	struct FLRendererConfig {
-	};
-
-	FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLRendererConfig& rendererConfig);
+	FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLVertexBuffer& vertexBuffer);
 	~FLRenderer();
 
 	FLRenderer(const FLRenderer&) = delete;
@@ -26,14 +24,14 @@ private:
 	uint32_t imageIndex;
 	uint32_t currentFrame = 0;
 
-	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 
-	void createCommandPool();
+	FLVertexBuffer& vBuffer;
+
 	void createCommandBuffers();
 	void createSyncObjects();
 	void beginCommandBuffers(VkCommandBuffer& commandBuffer);

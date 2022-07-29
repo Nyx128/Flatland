@@ -1,6 +1,8 @@
 #include "FLPipeline.hpp"
 #include "FLUtil.hpp"
 #include "vulkan_asserts.hpp"
+#include "FLModel2D.hpp"
+
 #include <iostream>
 
 FLPipeline::FLPipeline(FLDevice& _device, FLSwapchain& _swapchain, FLPipelineBuilder builder):device(_device), swapchain(_swapchain) {
@@ -35,12 +37,6 @@ void FLPipeline::createDefaultPipelineConfig(FLPipelineConfig& pipelineConfig){
 	pipelineConfig.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	pipelineConfig.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	pipelineConfig.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
-
-	pipelineConfig.vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	pipelineConfig.vertexInputInfo.vertexBindingDescriptionCount = 0;
-	pipelineConfig.vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-	pipelineConfig.vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	pipelineConfig.vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
 
 	pipelineConfig.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	pipelineConfig.viewportInfo.pNext = nullptr;
@@ -141,12 +137,23 @@ void FLPipeline::createGraphicsPipeline(){
 	VK_CHECK_RESULT(result, "Failed to create Pipeline layout");
 	//
 
+	auto VertexBindingDescriptions = FLModel2D::Vertex::getBindingDescription();
+	auto VertexAttributeDescriptions = FLModel2D::Vertex::getAttributeDescriptions();
+
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+
+	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = &VertexBindingDescriptions;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(VertexAttributeDescriptions.size());
+	vertexInputInfo.pVertexAttributeDescriptions = VertexAttributeDescriptions.data();
+
 	//create graphics pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
 	pipelineInfo.pStages = shaderStages;
-	pipelineInfo.pVertexInputState = &pipelineConfig.vertexInputInfo;
+	pipelineInfo.pVertexInputState = &vertexInputInfo;
 	pipelineInfo.pInputAssemblyState = &pipelineConfig.inputAssemblyInfo;
 	pipelineInfo.pViewportState = &pipelineConfig.viewportInfo;
 	pipelineInfo.pRasterizationState = &pipelineConfig.rasterizationInfo;

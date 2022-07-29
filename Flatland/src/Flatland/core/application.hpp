@@ -1,7 +1,5 @@
 #pragma once
-#include "../core.hpp"
 #include "FLWindow.hpp"
-#include "gameInstance.hpp"
 #include <memory>
 
 #include "../vulkan/FLDevice.hpp"
@@ -9,11 +7,12 @@
 #include "../vulkan/FLPipeline.hpp"
 #include "../vulkan/FLRenderer.hpp"
 
-class FL_API Application{
+class Application{
 public:
-	Application(gameInstance* _gameInst);
+	Application();
 	~Application();
 
+	void createMemoryAllocator();
 	void run();
 
 private:
@@ -22,7 +21,7 @@ private:
 	std::unique_ptr<FLSwapchain> swapchain;
 	std::unique_ptr<FLPipeline> graphicsPipeline;
 	std::unique_ptr<FLRenderer> renderer;
-	gameInstance* gameInst;
+
 
 	void initVulkan();
 };
