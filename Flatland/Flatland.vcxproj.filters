@@ -63,6 +63,9 @@
     <ClCompile Include="src\Flatland\core\vma_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Flatland\core\FLInputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Flatland\core\logger.hpp">
@@ -975,6 +978,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="external\glm\vector_relational.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\core\FLInputManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

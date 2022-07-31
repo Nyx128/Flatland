@@ -11,6 +11,8 @@ FLWindow::FLWindow(const char* _windowName, uint32_t _width, uint32_t _height): 
 
 	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	glfwSetKeyCallback(window, FLInputManager::key_callback);
+	glfwSetMouseButtonCallback(window, FLInputManager::mouse_button_callback);
 }
 
 FLWindow::~FLWindow(){

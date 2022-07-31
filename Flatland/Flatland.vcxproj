@@ -109,6 +109,7 @@
     <ClCompile Include="src\entry.cpp" />
     <ClCompile Include="src\Flatland\core\application.cpp" />
     <ClCompile Include="src\Flatland\core\asserts.cpp" />
+    <ClCompile Include="src\Flatland\core\FLInputManager.cpp" />
     <ClCompile Include="src\Flatland\core\vma_impl.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLModel2D.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLPipeline.cpp" />
@@ -416,6 +417,7 @@
     <ClInclude Include="src\Flatland\core\application.hpp" />
     <ClInclude Include="src\Flatland\core\asserts.hpp" />
     <ClInclude Include="src\Flatland\core\EntryPoint.hpp" />
+    <ClInclude Include="src\Flatland\core\FLInputManager.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLModel2D.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLPipeline.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLRenderer.hpp" />

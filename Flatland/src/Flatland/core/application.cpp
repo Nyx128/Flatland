@@ -3,6 +3,7 @@
 #include "vulkan_asserts.hpp"
 #include "FLModel2D.hpp"
 #include "FLVertexBuffer.hpp"
+#include "FLInputManager.hpp"
 
 
 Application::Application() {
@@ -30,6 +31,9 @@ void Application::initVulkan(){
     graphicsPipeline = std::make_unique<FLPipeline>(*device, *swapchain, pipelineBuilder);
 }
 
+void processInput() {
+    if (FLInputManager::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) { printf("left mb pressed\n"); }
+}
 
 void Application::run(){
 
@@ -46,7 +50,7 @@ void Application::run(){
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         glfwPollEvents();
-
+        processInput();
         renderer->draw();
     }
 

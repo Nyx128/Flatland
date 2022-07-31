@@ -1,6 +1,8 @@
 #pragma once
 #include "GLFW/include/glfw3.h"
 #include "GLFW/include/glfw3native.h"
+#include "FLInputManager.hpp"
+
 
 class FLWindow {
 public:
