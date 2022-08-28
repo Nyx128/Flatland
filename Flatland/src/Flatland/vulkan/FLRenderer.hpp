@@ -2,11 +2,12 @@
 #include "FLSwapchain.hpp"
 #include "FLPipeline.hpp"
 #include "FLVertexBuffer.hpp"
+#include "FLGameObject.hpp"
 
 class FLRenderer {
 public:
 
-	FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLVertexBuffer& vertexBuffer);
+	FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, std::vector<FLGameObject>& gameObjects);
 	~FLRenderer();
 
 	FLRenderer(const FLRenderer&) = delete;
@@ -30,7 +31,7 @@ private:
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 
-	FLVertexBuffer& vBuffer;
+	std::vector<FLGameObject>& gameObjects;
 
 	void createCommandBuffers();
 	void createSyncObjects();

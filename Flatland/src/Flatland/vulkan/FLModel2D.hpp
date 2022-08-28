@@ -1,9 +1,21 @@
 #pragma once
 #include "FLDevice.hpp"
+#include "FLVertexBuffer.hpp"
+#include "FLIndexBuffer.hpp"
 
+#ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
+#endif 
+
+#ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#endif
+
+#ifndef GLM_FORCE_LEFT_HANDED
 #define GLM_FORCE_LEFT_HANDED
+#endif 
+
+
 #include "glm/glm.hpp"
 
 #include <vector>
@@ -39,14 +51,29 @@ public:
 		}
 	};
 
-	FLModel2D(std::vector<Vertex> vertices);
+	struct PushConstantData {
+		glm::mat2 matrix{1.0f};
+		glm::vec2 position;
+		alignas(16)glm::vec3 color;
+	};
+
+	FLModel2D(FLDevice& device, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
 	~FLModel2D();
 
 	FLModel2D(const FLModel2D&) = delete;
 	FLModel2D& operator=(const FLModel2D&) = delete;
 
+	FLVertexBuffer& getVertexBuffer() { return vertexBuffer; }
+	FLIndexBuffer& getIndexBuffer() { return indexBuffer; }
+	uint32_t getVertexCount() const { return static_cast<uint32_t>(vertices.size()); }
+	uint32_t getIndexCount() const { return indexCount; }
 	std::vector<Vertex> getVertices() { return vertices; }
-
 private:
 	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+	uint32_t indexCount = static_cast<uint32_t>(indices.size());
+	FLDevice& device;
+
+	FLVertexBuffer vertexBuffer{device, vertices.data(), (VkDeviceSize)sizeof(Vertex) * vertices.size()};
+	FLIndexBuffer indexBuffer{ device, indices.data(), (VkDeviceSize)sizeof(uint16_t) * indices.size() };
 };

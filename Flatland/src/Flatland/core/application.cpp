@@ -5,6 +5,13 @@
 #include "FLVertexBuffer.hpp"
 #include "FLInputManager.hpp"
 
+#ifndef WINDOW_WIDTH
+#define WINDOW_WIDTH 1280
+#endif
+
+#ifndef WINDOW_HEIGHT
+#define WINDOW_HEIGHT 720
+#endif
 
 Application::Application() {
     
@@ -16,7 +23,7 @@ Application::~Application(){
 }
 
 void Application::initVulkan(){
-    window = std::make_shared<FLWindow>("Sandbox", 1280, 720);
+    window = std::make_shared<FLWindow>("Sandbox", WINDOW_WIDTH, WINDOW_HEIGHT);
     device = std::make_unique<FLDevice>(window);
     
     swapchain = std::make_unique<FLSwapchain>(*device);
@@ -32,21 +39,33 @@ void Application::initVulkan(){
 }
 
 void processInput() {
-    if (FLInputManager::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) { printf("left mb pressed\n"); }
+    
 }
 
 void Application::run(){
 
     initVulkan();
     const std::vector<FLModel2D::Vertex> vertices = {
-    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
     };
-    FLModel2D triangle{ vertices };
-    FLVertexBuffer buffer{*device, (void*)triangle.getVertices().data(), sizeof(FLModel2D::Vertex) * vertices.size() };
-    
-    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, buffer);
+
+    const std::vector<uint16_t> indices = {
+    0, 1, 2, 2, 3, 0
+    };
+    std::shared_ptr<FLModel2D> triangle = std::make_shared<FLModel2D>(*device, vertices, indices);
+
+    FLGameObject triObj = FLGameObject::createGameObject();
+    triObj.model = triangle;
+    triObj.tranform.position = { glm::vec2(0.0f, 0.0f) };
+    triObj.tranform.scale = { glm::vec2(1.7f, 0.2f) };
+    triObj.tranform.rotation = glm::radians(0.0f);
+
+    gameObjects.push_back(std::move(triObj));
+
+    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, gameObjects);
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         glfwPollEvents();

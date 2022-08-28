@@ -6,6 +6,8 @@
 #include "../vulkan/FLSwapchain.hpp"
 #include "../vulkan/FLPipeline.hpp"
 #include "../vulkan/FLRenderer.hpp"
+#include "FLGameObject.hpp"
+#include "FLModel2D.hpp"
 
 class Application{
 public:
@@ -22,6 +24,7 @@ private:
 	std::unique_ptr<FLPipeline> graphicsPipeline;
 	std::unique_ptr<FLRenderer> renderer;
 
+	std::vector<FLGameObject> gameObjects;
 
 	void initVulkan();
 };

@@ -32,6 +32,7 @@ public:
 
 	static void createDefaultPipelineConfig(FLPipelineConfig& pipelineConfig);
 	VkPipeline& getPipeline() { return graphicsPipeline; }
+	VkPipelineLayout getLayout() { return pipelineLayout; }
 
 private:
 	FLDevice& device;

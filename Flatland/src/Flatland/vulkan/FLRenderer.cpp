@@ -3,9 +3,10 @@
 #include "FLRenderer.hpp"
 #include "../core/logger.hpp"
 #include "vulkan_asserts.hpp"
+#include "core/FLInputManager.hpp"
 
-FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, FLVertexBuffer& vertexBuffer): device(_device),
-swapchain(_swapchain), graphicsPipeline(_pipeline), vBuffer(vertexBuffer) {
+FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, std::vector<FLGameObject>& gameObjects): device(_device),
+swapchain(_swapchain), graphicsPipeline(_pipeline), gameObjects(gameObjects) {
 	FL_TRACE("FLRenderer constructor called");
 	createCommandBuffers();
 	createSyncObjects();
@@ -116,12 +117,37 @@ void FLRenderer::recordCommands(VkCommandBuffer& commandBuffer){
 	scissor.extent = swapchain.getswapchainExtent();
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	VkDeviceSize offsets[] = { 0 };
-	VkBuffer vertexBuffers[] = {vBuffer.getBuffer()};
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	FLModel2D::PushConstantData pushData;
+	pushData.color = glm::vec3(0.05f, 0.1f, 0.9f);
+	for (FLGameObject& obj : gameObjects) {
+		if (FLInputManager::isKeyPressed(FL_KEY_SPACE)) {
+			obj.tranform.rotation += 0.05;
+		};
+		if (FLInputManager::isKeyPressed(FL_KEY_RIGHT)) {
+			obj.tranform.position.x += 0.01f;
+		}
+		if (FLInputManager::isKeyPressed(FL_KEY_LEFT)) {
+			obj.tranform.position.x -= 0.01f;
+		}
+		if (FLInputManager::isKeyPressed(FL_KEY_DOWN)) {
+			obj.tranform.position.y += 0.01f;
+		}
+		if (FLInputManager::isKeyPressed(FL_KEY_UP)) {
+			obj.tranform.position.y -= 0.01f;
+		}
+		pushData.matrix = obj.tranform.getTransformMatrix();
+		pushData.position = obj.tranform.position;
+		vkCmdPushConstants(commandBuffer, graphicsPipeline.getLayout(),
+			VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(FLModel2D::PushConstantData), &pushData);
 
-	//draw command
-	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+		VkDeviceSize offsets[] = { 0 };
+		VkBuffer vertexBuffers[] = { obj.model->getVertexBuffer().getBuffer()};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+		vkCmdBindIndexBuffer(commandBuffer, obj.model->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT16);
+
+		//draw command
+		vkCmdDrawIndexed(commandBuffer, obj.model->getIndexCount(), 1, 0, 0, 0);
+	}
 }
 
 void FLRenderer::endRenderpass(VkCommandBuffer& commandBuffer){

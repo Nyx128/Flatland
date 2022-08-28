@@ -130,8 +130,16 @@ void FLPipeline::createGraphicsPipeline(){
 	//
 
 	//create Pipeline layout
+
+	VkPushConstantRange pushConstantRange{};
+	pushConstantRange.size = sizeof(FLModel2D::PushConstantData);
+	pushConstantRange.offset = 0;
+	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+	pipelineLayoutInfo.pushConstantRangeCount = 1;
 
 	auto result = vkCreatePipelineLayout(device.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout);
 	VK_CHECK_RESULT(result, "Failed to create Pipeline layout");
