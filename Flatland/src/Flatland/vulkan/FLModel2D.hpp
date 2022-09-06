@@ -57,7 +57,7 @@ public:
 		alignas(16)glm::vec3 color;
 	};
 
-	FLModel2D(FLDevice& device, std::vector<Vertex> vertices, std::vector<uint16_t> indices);
+	FLModel2D(FLDevice& device, std::vector<Vertex> vertices, std::vector<uint32_t> indices);
 	~FLModel2D();
 
 	FLModel2D(const FLModel2D&) = delete;
@@ -68,12 +68,15 @@ public:
 	uint32_t getVertexCount() const { return static_cast<uint32_t>(vertices.size()); }
 	uint32_t getIndexCount() const { return indexCount; }
 	std::vector<Vertex> getVertices() { return vertices; }
+
+	static std::shared_ptr<FLModel2D> createCircle(FLDevice& device, uint32_t numSides, glm::vec3 color);
+	static std::shared_ptr<FLModel2D> createSquare(FLDevice& device, glm::vec2 offset, glm::vec3 color);
 private:
 	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
+	std::vector<uint32_t> indices;
 	uint32_t indexCount = static_cast<uint32_t>(indices.size());
 	FLDevice& device;
 
 	FLVertexBuffer vertexBuffer{device, vertices.data(), (VkDeviceSize)sizeof(Vertex) * vertices.size()};
-	FLIndexBuffer indexBuffer{ device, indices.data(), (VkDeviceSize)sizeof(uint16_t) * indices.size() };
+	FLIndexBuffer indexBuffer{ device, indices.data(), (VkDeviceSize)sizeof(uint32_t) * indices.size() };
 };

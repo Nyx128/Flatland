@@ -4,9 +4,15 @@
 #include "../core/logger.hpp"
 #include "vulkan_asserts.hpp"
 #include "core/FLInputManager.hpp"
+#include "FLModel2D.hpp"
+#include "ECS/FLComponentManager.hpp"
+#include "ECS/components/Renderable.hpp"
+#include "ECS/components/Transform2D.hpp"
 
-FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline, std::vector<FLGameObject>& gameObjects): device(_device),
-swapchain(_swapchain), graphicsPipeline(_pipeline), gameObjects(gameObjects) {
+extern FLComponentManager flComponentManager;
+
+FLRenderer::FLRenderer(FLDevice& _device, FLSwapchain& _swapchain, FLPipeline& _pipeline): device(_device),
+swapchain(_swapchain), graphicsPipeline(_pipeline) {
 	FL_TRACE("FLRenderer constructor called");
 	createCommandBuffers();
 	createSyncObjects();
@@ -23,7 +29,7 @@ FLRenderer::~FLRenderer(){
 	}
 }
 
-void FLRenderer::draw(){
+void FLRenderer::draw(std::set<FLEntity> renderEntities){
 	vkWaitForFences(device.getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
 	auto result = vkAcquireNextImageKHR(device.getDevice(), swapchain.getHandle(), UINT64_MAX,
@@ -41,7 +47,7 @@ void FLRenderer::draw(){
 	vkResetCommandBuffer(commandBuffers[currentFrame], 0);
 	beginCommandBuffers(commandBuffers[currentFrame]);
 	beginRenderpass(commandBuffers[currentFrame], imageIndex);
-	recordCommands(commandBuffers[currentFrame]);
+	recordCommands(renderEntities, commandBuffers[currentFrame]);
 	endRenderpass(commandBuffers[currentFrame]);
 	endCommandBuffers(commandBuffers[currentFrame]);
 
@@ -99,7 +105,7 @@ void FLRenderer::createCommandBuffers(){
 	VK_CHECK_RESULT(result, "Failed to create renderer command buffers");
 }
 
-void FLRenderer::recordCommands(VkCommandBuffer& commandBuffer){
+void FLRenderer::recordCommands(std::set<FLEntity> renderEntities, VkCommandBuffer& commandBuffer){
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline.getPipeline());
 
 	//set the dynamic states
@@ -119,34 +125,22 @@ void FLRenderer::recordCommands(VkCommandBuffer& commandBuffer){
 
 	FLModel2D::PushConstantData pushData;
 	pushData.color = glm::vec3(0.05f, 0.1f, 0.9f);
-	for (FLGameObject& obj : gameObjects) {
-		if (FLInputManager::isKeyPressed(FL_KEY_SPACE)) {
-			obj.tranform.rotation += 0.05;
-		};
-		if (FLInputManager::isKeyPressed(FL_KEY_RIGHT)) {
-			obj.tranform.position.x += 0.01f;
-		}
-		if (FLInputManager::isKeyPressed(FL_KEY_LEFT)) {
-			obj.tranform.position.x -= 0.01f;
-		}
-		if (FLInputManager::isKeyPressed(FL_KEY_DOWN)) {
-			obj.tranform.position.y += 0.01f;
-		}
-		if (FLInputManager::isKeyPressed(FL_KEY_UP)) {
-			obj.tranform.position.y -= 0.01f;
-		}
-		pushData.matrix = obj.tranform.getTransformMatrix();
-		pushData.position = obj.tranform.position;
+
+	for (const FLEntity& entity : renderEntities) {
+		auto transform = flComponentManager.GetComponent<Transform2D>(entity);
+		auto renderable = flComponentManager.GetComponent<Renderable>(entity);
+		pushData.matrix = transform.getTransformMatrix();
+		pushData.position = transform.position;
 		vkCmdPushConstants(commandBuffer, graphicsPipeline.getLayout(),
 			VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(FLModel2D::PushConstantData), &pushData);
 
 		VkDeviceSize offsets[] = { 0 };
-		VkBuffer vertexBuffers[] = { obj.model->getVertexBuffer().getBuffer()};
+		VkBuffer vertexBuffers[] = { renderable.model->getVertexBuffer().getBuffer()};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(commandBuffer, obj.model->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT16);
+		vkCmdBindIndexBuffer(commandBuffer, renderable.model->getIndexBuffer().getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 		//draw command
-		vkCmdDrawIndexed(commandBuffer, obj.model->getIndexCount(), 1, 0, 0, 0);
+		vkCmdDrawIndexed(commandBuffer, renderable.model->getIndexCount(), 1, 0, 0, 0);
 	}
 }
 

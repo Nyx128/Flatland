@@ -13,5 +13,5 @@ layout( push_constant ) uniform Push{
 
 void main() {
     gl_Position = vec4(push.matrix * inPosition, 0.0, 1.0) + vec4(push.position, 0.0, 0.0);
-    fragColor = push.color;
+    fragColor = inColor;
 }

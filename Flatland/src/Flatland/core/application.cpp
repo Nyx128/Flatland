@@ -4,6 +4,9 @@
 #include "FLModel2D.hpp"
 #include "FLVertexBuffer.hpp"
 #include "FLInputManager.hpp"
+#include "ECS/components/Renderable.hpp"
+
+#include <chrono>
 
 #ifndef WINDOW_WIDTH
 #define WINDOW_WIDTH 1280
@@ -12,6 +15,10 @@
 #ifndef WINDOW_HEIGHT
 #define WINDOW_HEIGHT 720
 #endif
+
+ FLEntityManager flEntityManager;
+ FLComponentManager flComponentManager;
+ FLSystemManager flSystemManager;
 
 Application::Application() {
     
@@ -42,36 +49,72 @@ void processInput() {
     
 }
 
+class TestSystem : public FLSystem {
+public:
+    TestSystem() {
+    
+    };
+    ~TestSystem() {}
+    void Update(float dt) {
+        for (auto& entity : mEntities) {
+            auto& transform = flComponentManager.GetComponent<Transform2D>(entity);
+
+            if (FLInputManager::isKeyPressed(FL_KEY_UP)) {
+                transform.position.y += -2.0f * dt;
+            }
+            if (FLInputManager::isKeyPressed(FL_KEY_DOWN)) {
+                transform.position.y += 2.0f * dt;
+            }
+            if (FLInputManager::isKeyPressed(FL_KEY_RIGHT)) {
+                transform.position.x += 2.0f * dt;
+            }
+            if (FLInputManager::isKeyPressed(FL_KEY_LEFT)) {
+                transform.position.x += -2.0f * dt;
+            }
+            if (FLInputManager::isKeyPressed(FL_KEY_SPACE)) {
+                transform.rotation += 1.0f * dt;
+            }
+        }
+    }
+};
+
 void Application::run(){
 
     initVulkan();
-    const std::vector<FLModel2D::Vertex> vertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-    };
 
-    const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0
-    };
-    std::shared_ptr<FLModel2D> triangle = std::make_shared<FLModel2D>(*device, vertices, indices);
+    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline);
 
-    FLGameObject triObj = FLGameObject::createGameObject();
-    triObj.model = triangle;
-    triObj.tranform.position = { glm::vec2(0.0f, 0.0f) };
-    triObj.tranform.scale = { glm::vec2(1.7f, 0.2f) };
-    triObj.tranform.rotation = glm::radians(0.0f);
+    float dt = 0.0f;
 
-    gameObjects.push_back(std::move(triObj));
+    flComponentManager.RegisterComponent<Transform2D>();
+    flComponentManager.RegisterComponent<Renderable>();
+    auto testSys = flSystemManager.RegisterSystem<TestSystem>();
 
-    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, gameObjects);
+    Signature signature;
+    signature.set(flComponentManager.GetComponentType<Transform2D>());
+    signature.set(flComponentManager.GetComponentType<Renderable>());
+    flSystemManager.SetSignature<TestSystem>(signature);
+
+    FLEntity box = flEntityManager.CreateEntity();
+    flComponentManager.AddComponent(box, Transform2D{});
+    std::shared_ptr<FLModel2D> square = FLModel2D::createSquare(*device, glm::vec2(0.0f), glm::vec3(0.05f, 0.1f, 0.9f));
+    flComponentManager.AddComponent(box, Renderable{square});
+
+    testSys->mEntities.emplace(box);
 
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
+        auto startTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
         processInput();
-        renderer->draw();
-    }
 
+        renderer->draw(testSys->mEntities);
+        testSys->Update(dt);
+
+        auto stopTime = std::chrono::high_resolution_clock::now();
+
+        dt = std::chrono::duration<float, std::chrono::seconds::period>(stopTime - startTime).count();
+
+    }
+    flComponentManager.cleanup();
 }
 

@@ -9,12 +9,15 @@
 #include "FLGameObject.hpp"
 #include "FLModel2D.hpp"
 
+#include "ECS/FLEntityManager.hpp"
+#include "ECS/FLComponentManager.hpp"
+#include "ECS/FLSystemManager.hpp"
+
+
 class Application{
 public:
 	Application();
 	~Application();
-
-	void createMemoryAllocator();
 	void run();
 
 private:
@@ -23,8 +26,6 @@ private:
 	std::unique_ptr<FLSwapchain> swapchain;
 	std::unique_ptr<FLPipeline> graphicsPipeline;
 	std::unique_ptr<FLRenderer> renderer;
-
-	std::vector<FLGameObject> gameObjects;
 
 	void initVulkan();
 };

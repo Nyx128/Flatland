@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 
 #include "FLModel2D.hpp"
-#include "components/Transform2D.hpp"
+#include "ECS/components/Transform2D.hpp"
 
 using gameObject_ID = std::uint32_t;
 

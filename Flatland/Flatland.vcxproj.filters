@@ -69,10 +69,31 @@
     <ClCompile Include="src\Flatland\vulkan\FLGameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flatland\components\component.cpp">
+    <ClCompile Include="src\Flatland\ECS\components\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Flatland\vulkan\FLIndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLEntityManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLComponentArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLComponentManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\FLSystemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\ECS\components\Renderable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -995,13 +1016,34 @@
     <ClInclude Include="src\Flatland\vulkan\FLGameObject.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flatland\components\Transform2D.hpp">
+    <ClInclude Include="src\Flatland\ECS\components\Transform2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flatland\components\component.hpp">
+    <ClInclude Include="src\Flatland\ECS\components\component.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Flatland\vulkan\FLIndexBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLEntity.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLEntityManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLComponentArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLComponentManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\FLSystemManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\components\Renderable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
