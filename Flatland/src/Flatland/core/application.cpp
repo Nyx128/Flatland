@@ -5,6 +5,9 @@
 #include "FLVertexBuffer.hpp"
 #include "FLInputManager.hpp"
 #include "ECS/components/Renderable.hpp"
+#include "ECS/components/Transform2D.hpp"
+#include "ECS/components/ImageTexture.hpp"
+#include "FLUniformBufferArray.hpp"
 
 #include <chrono>
 
@@ -19,7 +22,7 @@
  FLEntityManager flEntityManager;
  FLComponentManager flComponentManager;
  FLSystemManager flSystemManager;
-
+ 
 Application::Application() {
     
 
@@ -82,12 +85,12 @@ void Application::run(){
 
     initVulkan();
 
-    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline);
 
     float dt = 0.0f;
 
     flComponentManager.RegisterComponent<Transform2D>();
     flComponentManager.RegisterComponent<Renderable>();
+    flComponentManager.RegisterComponent<ImageTexture>();
     auto testSys = flSystemManager.RegisterSystem<TestSystem>();
 
     Signature signature;
@@ -97,17 +100,30 @@ void Application::run(){
 
     FLEntity box = flEntityManager.CreateEntity();
     flComponentManager.AddComponent(box, Transform2D{});
+    auto& transformBox = flComponentManager.GetComponent<Transform2D>(box);
+    transformBox.scale = glm::vec2(1.6, 0.9);
+    transformBox.position = glm::vec2(-0.5, 0.0);
     std::shared_ptr<FLModel2D> square = FLModel2D::createSquare(*device, glm::vec2(0.0f), glm::vec3(0.05f, 0.1f, 0.9f));
     flComponentManager.AddComponent(box, Renderable{square});
+    std::shared_ptr<FLTexture> imgTexZoro = std::make_shared<FLTexture>(*device, "external/images/zoro.png");
+    flComponentManager.AddComponent(box, ImageTexture{ imgTexZoro });
+
+    FLEntity box_2 = flEntityManager.CreateEntity();
+    flComponentManager.AddComponent(box_2, Transform2D{});
+    flComponentManager.AddComponent(box_2, Renderable{ square });
+    std::shared_ptr<FLTexture> imgTexLaw = std::make_shared<FLTexture>(*device, "external/images/law.png");
+    flComponentManager.AddComponent(box_2, ImageTexture{ imgTexLaw });
 
     testSys->mEntities.emplace(box);
+    testSys->mEntities.emplace(box_2);
 
+    renderer = std::make_unique<FLRenderer>(*device, *swapchain, *graphicsPipeline, testSys->mEntities);
     while (!glfwWindowShouldClose(window->getWindowPointer())) {
         auto startTime = std::chrono::high_resolution_clock::now();
         glfwPollEvents();
         processInput();
 
-        renderer->draw(testSys->mEntities);
+        renderer->draw();
         testSys->Update(dt);
 
         auto stopTime = std::chrono::high_resolution_clock::now();

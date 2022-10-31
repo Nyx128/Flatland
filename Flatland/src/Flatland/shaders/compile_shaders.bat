@@ -10,4 +10,5 @@ CALL %GLSLC% "%shaderDir%\unlit.frag" -o "%OUTPUT%\unlit.frag.spv"
 @echo on
 REM shaders compiled successfully
 @echo off
+PAUSE
 

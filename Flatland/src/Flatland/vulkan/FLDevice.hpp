@@ -40,6 +40,10 @@ public:
 	VmaAllocator& getAllocator() { return allocator; }
 	VkCommandPool getCommandPool() { return commandPool; }
 
+	VkCommandBuffer beginSingleTimeCommands();
+	void endSingleTimeCommands(VkCommandBuffer& commandBuffer);
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
 private:
 	VmaAllocator allocator;
 	VkSurfaceKHR windowSurface;//put this before flInstance so it gets destroyed first

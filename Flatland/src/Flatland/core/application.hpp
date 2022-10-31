@@ -6,7 +6,6 @@
 #include "../vulkan/FLSwapchain.hpp"
 #include "../vulkan/FLPipeline.hpp"
 #include "../vulkan/FLRenderer.hpp"
-#include "FLGameObject.hpp"
 #include "FLModel2D.hpp"
 
 #include "ECS/FLEntityManager.hpp"

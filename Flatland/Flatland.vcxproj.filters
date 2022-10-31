@@ -66,9 +66,6 @@
     <ClCompile Include="src\Flatland\core\FLInputManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flatland\vulkan\FLGameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Flatland\ECS\components\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -93,7 +90,22 @@
     <ClCompile Include="src\Flatland\ECS\FLSystemManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Flatland\ECS\components\Renderable.cpp">
+    <ClCompile Include="src\Flatland\vulkan\FLTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\vulkan\FLDescriptorSetLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\vulkan\FLUniformBufferArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\vulkan\globalUbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\vulkan\FLDescriptorPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Flatland\test_systems\circular_motion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1013,9 +1025,6 @@
     <ClInclude Include="src\Flatland\core\FLInputManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Flatland\vulkan\FLGameObject.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Flatland\ECS\components\Transform2D.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1044,6 +1053,30 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Flatland\ECS\components\Renderable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\stb_image\stb_image.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\FLTexture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\FLDescriptorSetLayout.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\FLUniformBufferArray.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\globalUbo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\vulkan\FLDescriptorPool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\test_systems\circular_motion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Flatland\ECS\components\ImageTexture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

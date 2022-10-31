@@ -57,7 +57,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)Flatland\src\Flatland\vulkan;$(SolutionDir)Flatland\external;$(SolutionDir)Flatland\src\Flatland;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\src;$(VULKAN_SDK)\Include;$(SolutionDir)Flatland\src\Flatland\vulkan;$(SolutionDir)Flatland\external;$(SolutionDir)Flatland\src\Flatland;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -83,7 +83,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ObjectFileName>$(IntDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)Flatland\src\Flatland\vulkan;$(SolutionDir)Flatland\external;$(SolutionDir)Flatland\src\Flatland;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\3D\Flatland\Flatland\src;$(VULKAN_SDK)\Include;$(SolutionDir)Flatland\src\Flatland\vulkan;$(SolutionDir)Flatland\external;$(SolutionDir)Flatland\src\Flatland;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -108,18 +108,26 @@
     <ClCompile Include="external\glm\detail\glm.cpp" />
     <ClCompile Include="src\entry.cpp" />
     <ClCompile Include="src\Flatland\ECS\components\component.cpp" />
-    <ClCompile Include="src\Flatland\core\application.cpp" />
+    <ClCompile Include="src\Flatland\core\application.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="src\Flatland\core\asserts.cpp" />
     <ClCompile Include="src\Flatland\core\FLInputManager.cpp" />
     <ClCompile Include="src\Flatland\core\vma_impl.cpp" />
-    <ClCompile Include="src\Flatland\ECS\components\Renderable.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLComponentArray.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLComponentManager.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLEntity.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLEntityManager.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLSystem.cpp" />
     <ClCompile Include="src\Flatland\ECS\FLSystemManager.cpp" />
-    <ClCompile Include="src\Flatland\vulkan\FLGameObject.cpp" />
+    <ClCompile Include="src\Flatland\test_systems\circular_motion.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLDescriptorPool.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLDescriptorSetLayout.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLIndexBuffer.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLModel2D.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLPipeline.cpp" />
@@ -129,8 +137,11 @@
     <ClCompile Include="src\Flatland\core\logger.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLDevice.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLInstance.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLTexture.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\FLUniformBufferArray.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLUtil.cpp" />
     <ClCompile Include="src\Flatland\vulkan\FLVertexBuffer.cpp" />
+    <ClCompile Include="src\Flatland\vulkan\globalUbo.cpp" />
     <ClCompile Include="src\Flatland\vulkan\vulkan_asserts.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -423,8 +434,10 @@
     <ClInclude Include="external\glm\vec3.hpp" />
     <ClInclude Include="external\glm\vec4.hpp" />
     <ClInclude Include="external\glm\vector_relational.hpp" />
+    <ClInclude Include="external\stb_image\stb_image.hpp" />
     <ClInclude Include="external\VMA\vk_mem_alloc.h" />
     <ClInclude Include="src\Flatland\ECS\components\component.hpp" />
+    <ClInclude Include="src\Flatland\ECS\components\ImageTexture.hpp" />
     <ClInclude Include="src\Flatland\ECS\components\Renderable.hpp" />
     <ClInclude Include="src\Flatland\ECS\components\Transform2D.hpp" />
     <ClInclude Include="src\Flatland\core\application.hpp" />
@@ -437,7 +450,9 @@
     <ClInclude Include="src\Flatland\ECS\FLEntityManager.hpp" />
     <ClInclude Include="src\Flatland\ECS\FLSystem.hpp" />
     <ClInclude Include="src\Flatland\ECS\FLSystemManager.hpp" />
-    <ClInclude Include="src\Flatland\vulkan\FLGameObject.hpp" />
+    <ClInclude Include="src\Flatland\test_systems\circular_motion.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLDescriptorPool.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLDescriptorSetLayout.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLIndexBuffer.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLModel2D.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLPipeline.hpp" />
@@ -447,8 +462,11 @@
     <ClInclude Include="src\Flatland\core\logger.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLDevice.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLInstance.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLTexture.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\FLUniformBufferArray.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLUtil.hpp" />
     <ClInclude Include="src\Flatland\vulkan\FLVertexBuffer.hpp" />
+    <ClInclude Include="src\Flatland\vulkan\globalUbo.hpp" />
     <ClInclude Include="src\Flatland\vulkan\vulkan_asserts.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -72,6 +72,15 @@ public:
 		return mComponentArray[mEntityToIndexMap[entity]];
 	}
 
+	
+	bool hasData(FLEntity entity) {
+		if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end()) {
+			return true;
+		}
+
+		return false;
+	}
+
 private:
 	// The packed array of components (of generic type T),
 	// set to a specified maximum amount, matching the maximum number

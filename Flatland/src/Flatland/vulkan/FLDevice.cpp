@@ -178,6 +178,7 @@ void FLDevice::createDeviceHandle(){
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	deviceFeatures.fillModeNonSolid = VK_TRUE;
 	deviceFeatures.wideLines = VK_TRUE;
+	deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -226,4 +227,47 @@ void FLDevice::createCommandPool(){
 void FLDevice::createWindowSurface(){
 	auto result = glfwCreateWindowSurface(flInstance.getInstance(), flWindow->getWindowPointer(), nullptr, &windowSurface);
 	VK_CHECK_RESULT(result, "failed to create vulkan window surface");
+}
+
+VkCommandBuffer FLDevice::beginSingleTimeCommands() {
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+
+	VkCommandBuffer commandBuffer;
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer),
+		"Failed to allocate single time command buffer");
+
+	VkCommandBufferBeginInfo beginInfo{};
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	VK_CHECK_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo),
+		"Failed tp begin single time command buffer");
+	return commandBuffer;
+}
+
+void FLDevice::endSingleTimeCommands(VkCommandBuffer& commandBuffer){
+	VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer), "Failed to end single time command buffer");
+
+	VkSubmitInfo submitInfo{};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
+
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(graphicsQueue);
+
+	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+}
+
+void FLDevice::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size){
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+	VkBufferCopy copyRegion{};
+	copyRegion.size = size;
+	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+	endSingleTimeCommands(commandBuffer);
 }

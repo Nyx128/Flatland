@@ -19,6 +19,4 @@ private:
 	FLDevice& device;
 
 	void* bufferData;
-
-	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 };

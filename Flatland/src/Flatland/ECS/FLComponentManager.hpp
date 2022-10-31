@@ -70,6 +70,16 @@ public:
 		return GetComponentArray<T>()->GetData(entity);
 	}
 
+	template<typename T>
+	bool hasComponent(FLEntity entity) {
+		const char* typeName = typeid(T).name();
+
+		if (mComponentTypes.find(typeName) != mComponentTypes.end()) {
+			return GetComponentArray<T>()->hasData(entity);
+		}
+		else { return false; }
+	}
+
 	void EntityDestroyed(FLEntity entity);
 	void cleanup();//clean all the components after finishing process to avoid memory issues
 

@@ -40,7 +40,7 @@ FLIndexBuffer::FLIndexBuffer(FLDevice& _device, void* data,VkDeviceSize size):de
 	result = vmaCreateBuffer(device.getAllocator(), &indexBufferInfo, &vertexBufferAllocInfo, &indexBuffer, &indexBufferAllocation, nullptr);
 	VK_CHECK_RESULT(result, "Failed to create index buffer");
 
-	copyBuffer(stagingBuffer, indexBuffer, memSize);
+	device.copyBuffer(stagingBuffer, indexBuffer, memSize);
 
 	vmaDestroyBuffer(device.getAllocator(), stagingBuffer, stagingBufferAllocation);
 
@@ -58,36 +58,4 @@ FLIndexBuffer::~FLIndexBuffer() {
 	vkDestroyBuffer(device, buffer, allocationCallbacks);
 	vmaFreeMemory(allocator, allocation);
 	It is safe to pass null as bufferand /or allocation.*/
-}
-
-void FLIndexBuffer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size){
-	VkCommandBufferAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandPool = device.getCommandPool();
-	allocInfo.commandBufferCount = 1;
-	
-	VkCommandBuffer commandBuffer;
-	vkAllocateCommandBuffers(device.getDevice(), &allocInfo, &commandBuffer);
-
-	VkCommandBufferBeginInfo beginInfo{};
-	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-	vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-	VkBufferCopy copyRegion{};
-	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-	vkEndCommandBuffer(commandBuffer);
-
-	VkSubmitInfo submitInfo{};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
-
-	vkQueueSubmit(device.getGraphicsQueue(), 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(device.getGraphicsQueue());
-
-	vkFreeCommandBuffers(device.getDevice(), device.getCommandPool(), 1, &commandBuffer);
 }

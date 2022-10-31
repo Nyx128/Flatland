@@ -1,6 +1,7 @@
 #pragma once
 #include "FLDevice.hpp"
 #include "FLSwapchain.hpp"
+#include "FLDescriptorSetLayout.hpp"
 #include <array>
 
 class FLPipeline {
@@ -33,6 +34,15 @@ public:
 	static void createDefaultPipelineConfig(FLPipelineConfig& pipelineConfig);
 	VkPipeline& getPipeline() { return graphicsPipeline; }
 	VkPipelineLayout getLayout() { return pipelineLayout; }
+	std::array<VkDescriptorSetLayout, 3> getUniformBufferLayoutData() {
+		std::array<VkDescriptorSetLayout, 3> data;
+		auto layout = descriptorSetLayout.getLayout();
+		data[0] = layout;
+		data[1] = layout;
+		data[2] = layout;
+		return data;
+	}
+	VkDescriptorSetLayout& getDescriptorSetLayout() { return descriptorSetLayout.getLayout(); }
 
 private:
 	FLDevice& device;
@@ -40,6 +50,8 @@ private:
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
+
+	FLDescriptorSetLayout descriptorSetLayout{device};
 
 	FLPipelineConfig pipelineConfig;
 	const char* vertPath;

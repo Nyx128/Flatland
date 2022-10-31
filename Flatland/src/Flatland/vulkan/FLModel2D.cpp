@@ -35,10 +35,10 @@ std::shared_ptr<FLModel2D> FLModel2D::createCircle(FLDevice& device, uint32_t nu
 
 std::shared_ptr<FLModel2D> FLModel2D::createSquare(FLDevice& device, glm::vec2 offset, glm::vec3 color){
 	std::vector<Vertex> vertices = {
-	{glm::vec2(- 0.5f, -0.5f) + offset, color},
-	{glm::vec2(0.5f, -0.5f) + offset, color},
-	{ glm::vec2(0.5f, 0.5f) + offset, color},
-	{ glm::vec2(-0.5f, 0.5f) + offset, color}
+	{glm::vec2(- 0.5f, -0.5f) + offset, color, {1.0f, 0.0f}},
+	{glm::vec2(0.5f, -0.5f) + offset, color, {0.0f, 0.0f}},
+	{ glm::vec2(0.5f, 0.5f) + offset, color, {0.0f, 1.0f}},
+	{ glm::vec2(-0.5f, 0.5f) + offset, color, {1.0f, 1.0f}}
 	};
 
 	std::vector<uint32_t> indices = {

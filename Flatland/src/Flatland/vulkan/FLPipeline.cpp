@@ -136,10 +136,16 @@ void FLPipeline::createGraphicsPipeline(){
 	pushConstantRange.offset = 0;
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
+	descriptorSetLayout.AddLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_ALL_GRAPHICS);
+	descriptorSetLayout.AddLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_ALL_GRAPHICS);
+	descriptorSetLayout.build();
+
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
+	pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout.getLayout();
+	pipelineLayoutInfo.setLayoutCount = 1;
 
 	auto result = vkCreatePipelineLayout(device.getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout);
 	VK_CHECK_RESULT(result, "Failed to create Pipeline layout");
